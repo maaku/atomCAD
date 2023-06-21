@@ -42,6 +42,16 @@ pub fn pan_orbit_camera(
     };
     let window_size = Vec2::new(window.width() as f32, window.height() as f32);
 
+    // Don't move the camera if the cursor is outside the window.
+    match window.cursor_position() {
+        None => return,
+        Some(pos) => {
+            if pos.x < 0.0 || window_size.x < pos.x || pos.y < 0.0 || window_size.y < pos.y {
+                return;
+            }
+        }
+    };
+
     if egui_contexts.ctx_mut().is_pointer_over_area() {
         // don't move the camera if the mouse is over an egui element
         return;
