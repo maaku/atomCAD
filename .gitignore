@@ -1,6 +1,5 @@
 Cargo.lock
 /target
-/dist
 
 # macOS
 .DS_Store
