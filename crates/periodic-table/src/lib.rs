@@ -151,38 +151,38 @@ impl PeriodicTable {
     pub fn new() -> Self {
         let mut element_reprs = vec![
             ElementRepr {
-                color: Vec3::new(0.0, 0.0, 0.0), // Black
+                color: Color::rgb_u8(0, 0, 0), // black
                 radius: 1.0,
             };
             118
         ];
         element_reprs[Element::Hydrogen as usize - 1] = ElementRepr {
-            color: Vec3::new(0.8510, 0.8510, 0.8510), // white
+            color: Color::rgb(0.8510, 0.8510, 0.8510), // white
             radius: 1.2,
         };
         element_reprs[Element::Carbon as usize - 1] = ElementRepr {
-            color: Vec3::new(0.30196, 0.2902, 0.3098), // dark grey
+            color: Color::rgb(0.30196, 0.2902, 0.3098), // dark grey
             radius: 1.7,
         };
         element_reprs[Element::Oxygen as usize - 1] = ElementRepr {
-            color: Vec3::new(0.7490, 0.2118, 0.3176), // red
+            color: Color::rgb(0.7490, 0.2118, 0.3176), // red
             radius: 1.52,
         };
         element_reprs[Element::Silicon as usize - 1] = ElementRepr {
-            // color: Vec3::new(0.7294, 0.5804, 0.1686), // yellow
-            color: Vec3::new(0.5234, 0.5234, 0.5234), // light grey
+            // color: Color::rgb(0.7294, 0.5804, 0.1686), // yellow
+            color: Color::rgb(0.5234, 0.5234, 0.5234), // light grey
             radius: 2.1,
         };
         element_reprs[Element::Phosphorus as usize - 1] = ElementRepr {
-            color: Vec3::new(0.7019, 0.4314, 0.1451), // orange
+            color: Color::rgb(0.7019, 0.4314, 0.1451), // orange
             radius: 1.8,
         };
         element_reprs[Element::Nitrogen as usize - 1] = ElementRepr {
-            color: Vec3::new(0.2078, 0.4549, 0.6118), // blue
+            color: Color::rgb(0.2078, 0.4549, 0.6118), // blue
             radius: 1.55,
         };
         element_reprs[Element::Sulfur as usize - 1] = ElementRepr {
-            color: Vec3::new(0.7294, 0.5804, 0.1686), // yellow
+            color: Color::rgb(0.7294, 0.5804, 0.1686), // yellow
             radius: 1.8,
         };
 
@@ -193,9 +193,9 @@ impl PeriodicTable {
 #[derive(Debug, Copy, Clone)]
 #[repr(C)]
 pub struct ElementRepr {
-    color: Vec3, // RGB color space
-    radius: f32, // in angstroms
+    pub color: Color, // sRGB color space
+    pub radius: f32,  // in angstroms
 }
-const_assert_eq!(mem::size_of::<ElementRepr>(), 16);
+const_assert_eq!(mem::size_of::<ElementRepr>(), 24);
 
 // End of File
