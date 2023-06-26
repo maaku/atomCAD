@@ -1,9 +1,3 @@
-* {
-    margin:0;
-    padding:0;
-    overflow:hidden;
-}
-
 body, html {
     height: 100%;
 }
@@ -16,6 +10,7 @@ body {
         white 2px,
         white 20px
     );
+    margin: 0;
 }
 
 .game-container {
@@ -28,6 +23,6 @@ body {
 
 #bevy {
     background-color: white;
-    width: 100vw!important;
-    height: 100vh!important;
+    width: 800px;
+    height: 600px;
 }
