@@ -12,4 +12,9 @@ pub mod windows;
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
 
+#[cfg(target_family = "wasm")]
+pub mod web;
+#[cfg(target_family = "wasm")]
+pub use self::web::*;
+
 // End of File

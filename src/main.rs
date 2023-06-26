@@ -24,6 +24,8 @@ fn main() {
                 title: APP_NAME.into(),
                 // Turn off vsync to maximize CPU/GPU usage
                 present_mode: PresentMode::AutoNoVsync,
+                // See index.html if this changes
+                canvas: Some("#bevy".to_owned()),
                 ..default()
             }),
             ..default()
