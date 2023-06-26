@@ -14,6 +14,7 @@ use bevy_mod_picking::prelude::*;
 use atomcad::camera::{pan_orbit_camera, PanOrbitCamera};
 use atomcad::menubar::winit_menu_bar;
 use atomcad::molecule_builder::{init_molecule, molecule_builder};
+use atomcad::platform::bevy::PlatformDetails;
 use atomcad::APP_NAME;
 
 fn main() {
@@ -31,6 +32,7 @@ fn main() {
             ..default()
         }))
         .add_plugins(DefaultPickingPlugins)
+        .add_plugin(PlatformDetails)
         .add_plugin(EguiPlugin)
         .add_plugin(InfiniteGridPlugin)
         .add_startup_system(winit_menu_bar)
