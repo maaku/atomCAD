@@ -3,6 +3,5 @@
 // You can obtain one at http://mozilla.org/MPL/2.0/.
 
 pub mod bevy;
-pub mod menubar;
 
 // End of File

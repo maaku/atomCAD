@@ -3,6 +3,8 @@
 // You can obtain one at http://mozilla.org/MPL/2.0/.
 
 pub use crate::platform_impl::bevy;
-pub use crate::platform_impl::menubar;
+
+// FIXME: We should investigate using egui to create a menubar on web.
+pub use super::defaults::menubar;
 
 // End of File
