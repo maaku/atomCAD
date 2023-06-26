@@ -20,6 +20,7 @@ use atomcad::APP_NAME;
 fn main() {
     App::new()
         .insert_resource(WinitSettings::desktop_app())
+        .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: APP_NAME.into(),
