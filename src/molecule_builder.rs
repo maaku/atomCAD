@@ -4,7 +4,7 @@
 
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use periodic_table::Element;
+use periodic_table::{Element, PeriodicTable};
 use petgraph::stable_graph::NodeIndex;
 use std::collections::HashMap;
 
@@ -61,6 +61,7 @@ pub struct BondingSite {
 /// TODO: this may be redundant - I think `Assets` serves a very similar purpose
 #[derive(Resource)]
 pub struct PbrCache {
+    ptable: PeriodicTable,
     bonding_site: PbrBundle,
     atoms: HashMap<Element, PbrBundle>,
 }
@@ -107,9 +108,10 @@ pub fn molecule_builder(
             .id();
 
         // Add a new binding site
+        let carbon = &pbr_cache.ptable.element_reprs[Element::Carbon as usize - 1];
         let mut bonding_site = pbr_cache.bonding_site.clone();
         bonding_site.transform = *transform;
-        bonding_site.transform.translation += Vec3::new(1.5, 0.0, 0.0);
+        bonding_site.transform.translation += Vec3::new(carbon.radius + 0.5, 0.0, 0.0);
         let bonding_site = commands
             .spawn((
                 bonding_site,
@@ -151,6 +153,7 @@ pub fn init_molecule(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let mut pbr_cache = PbrCache {
+        ptable: PeriodicTable::new(),
         atoms: HashMap::new(),
         bonding_site: PbrBundle {
             mesh: meshes.add(Mesh::from(shape::UVSphere {
@@ -158,21 +161,22 @@ pub fn init_molecule(
                 sectors: 8,
                 stacks: 8,
             })),
-            material: materials.add(Color::rgb(0.8, 0.8, 0.8).into()),
+            material: materials.add(Color::rgb(0.6, 0.0, 0.0).into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         },
     };
 
+    let carbon = &pbr_cache.ptable.element_reprs[Element::Carbon as usize - 1];
     pbr_cache.atoms.insert(
         Element::Carbon,
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::UVSphere {
-                radius: 1.0,
+                radius: carbon.radius,
                 sectors: 8,
                 stacks: 8,
             })),
-            material: materials.add(Color::rgb(0.2, 0.2, 0.2).into()),
+            material: materials.add(carbon.color.into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         },
@@ -191,7 +195,7 @@ pub fn init_molecule(
 
     // Create a bonding site
     let mut initial_bonding_site_pbr = pbr_cache.bonding_site.clone();
-    initial_bonding_site_pbr.transform.translation = Vec3::new(1.5, 0.0, 0.0);
+    initial_bonding_site_pbr.transform.translation = Vec3::new(carbon.radius + 0.5, 0.0, 0.0);
     let initial_bonding_site = commands
         .spawn((
             initial_bonding_site_pbr,
