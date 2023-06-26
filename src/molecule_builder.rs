@@ -176,7 +176,8 @@ pub fn init_molecule(
                 sectors: 8,
                 stacks: 8,
             })),
-            material: materials.add(carbon.color.into()),
+            material: materials
+                .add(Color::rgb(carbon.color[0], carbon.color[1], carbon.color[2]).into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         },
