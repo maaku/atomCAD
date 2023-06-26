@@ -13,6 +13,11 @@ impl Plugin for PlatformDetails {
     }
 }
 
+// Updates the canvas size to match the browser window size.  As the user
+// resizes the browser window, the canvas element also needs to be resized to
+// match.  We could listen for WindowResize events, but the easiest and
+// simplest thing is to just set the size of the canvas at the beginning of
+// each frame to be equal to the current inner_size of the browser window.
 fn update_canvas_size(mut window: Query<&mut Window, With<PrimaryWindow>>) {
     (|| {
         let mut window = window.get_single_mut().ok()?;
