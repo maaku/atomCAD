@@ -7,8 +7,9 @@ use bevy::{
     window::{PresentMode, WindowPlugin},
     winit::WinitSettings,
 };
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use bevy_egui::EguiPlugin;
 use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_mod_picking::prelude::*;
 
 use atomcad::camera::{pan_orbit_camera, PanOrbitCamera};
@@ -35,11 +36,11 @@ fn main() {
         .add_plugins(DefaultPickingPlugins)
         .add_plugin(PlatformDetails)
         .add_plugin(EguiPlugin)
+        .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(InfiniteGridPlugin)
         .add_startup_system(winit_menu_bar)
         .add_startup_system(setup)
         .add_startup_system(init_molecule)
-        .add_system(ui_hello_world)
         .add_system(pan_orbit_camera)
         .add_system(molecule_builder)
         .run();
@@ -80,12 +81,6 @@ fn setup(mut commands: Commands) {
         },
         transform: Transform::from_xyz(-4.0, 8.0, 4.0),
         ..default()
-    });
-}
-
-fn ui_hello_world(mut contexts: EguiContexts) {
-    egui::Window::new("Hello").show(contexts.ctx_mut(), |ui| {
-        ui.label("Hello World!");
     });
 }
 
