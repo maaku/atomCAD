@@ -104,7 +104,7 @@ pub fn pan_orbit_camera(
             transform.rotation = yaw * transform.rotation; // rotate around global y axis
             transform.rotation = transform.rotation * pitch; // rotate around local x axis
         } else if pan.length_squared() > 0.0 {
-            // make panning distnace independent of resolution and FOV
+            // make panning distance independent of resolution and FOV
             if let Projection::Perspective(projection) = projection {
                 pan *= Vec2::new(projection.fov * projection.aspect_ratio, projection.fov)
                     / window_size;
