@@ -1,0 +1,8 @@
+[package]
+name = "atomcad"
+version = "0.1.0"
+publish = false
+authors = ["Machine Phase Systems <hello@machinephase.systems>"]
+edition = "2021"
+
+[dependencies]
