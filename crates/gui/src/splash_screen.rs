@@ -1,7 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of
 // the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-use crate::window::WindowManager;
+use crate::{menu, window::WindowManager};
 use std::sync::Arc;
 use winit::{
     event_loop::ActiveEventLoop,
@@ -15,14 +15,22 @@ use winit::{
 /// SplashScreen also provides a way to open or create new workspaces in their own Workspace's.
 pub struct SplashScreen {
     title: String,
+    platform_menubar: Arc<menu::PlatformMenubar>,
+    blueprint: Option<menu::Blueprint>,
     window: Option<Arc<Window>>,
     running: bool,
 }
 
 impl SplashScreen {
-    pub fn new(title: String) -> Self {
+    pub fn new(
+        title: String,
+        platform_menubar: Arc<menu::PlatformMenubar>,
+        blueprint: Option<menu::Blueprint>,
+    ) -> Self {
         Self {
             title,
+            platform_menubar,
+            blueprint,
             window: None,
             running: false,
         }
@@ -54,6 +62,14 @@ impl WindowManager for SplashScreen {
                 }
                 Ok(window) => self.window = Some(Arc::new(window)),
             };
+
+            if let (platform_menubar, Some(blueprint), Some(window)) = (
+                self.platform_menubar.as_ref(),
+                self.blueprint.as_ref(),
+                self.window.as_ref(),
+            ) {
+                menu::attach_menubar_to_window(window, platform_menubar, blueprint);
+            }
         }
 
         self.running = true;

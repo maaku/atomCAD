@@ -2,9 +2,13 @@
 // the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 use app::prelude::*;
-use gui::window::{SplashScreen, WindowManager};
+use gui::{
+    menu::{self, PlatformMenubar},
+    window::{SplashScreen, WindowManager},
+};
 use logging::prelude::*;
 use std::process::ExitCode;
+use std::sync::Arc;
 use winit::{
     application::ApplicationHandler,
     event::{DeviceEvent, DeviceId, StartCause, WindowEvent},
@@ -32,6 +36,10 @@ struct Application {
     /// Whether the application is in the active state (meaning a resume message has been processed
     /// at least once, without an intervening suspend) with the event loop running.
     running: bool,
+    /// A platform-specific handle to the OS object representing the menubar.  It is the value
+    /// returned by gui::menu::platform_setup, and needs to be kept around to be passed to
+    /// gui::menu::attach_menubar_to_window.
+    platform_menubar: Arc<PlatformMenubar>,
     /// The behavior of the application at startup/resume.  This determines what windows are created
     /// and shown to the user when the application is first started.  Once this action is performed,
     /// it is cleared (set to None).  Setting this value while the appliation is running will cause
@@ -47,10 +55,15 @@ struct Application {
 }
 
 impl Application {
-    fn new(display_name: String, startup_action: StartupAction) -> Self {
+    fn new(
+        display_name: String,
+        platform_menubar: Arc<PlatformMenubar>,
+        startup_action: StartupAction,
+    ) -> Self {
         Self {
             display_name,
             running: false,
+            platform_menubar,
             // Wrapped in an Option so that it can be cleared after the specified action is
             // performed.
             startup_action: Some(startup_action),
@@ -84,8 +97,67 @@ impl ApplicationHandler for Application {
         if let Some(startup_action) = self.startup_action.take() {
             match startup_action {
                 StartupAction::FirstTime => {
-                    let mut splash_screen =
-                        SplashScreen::new(format!("{} — Getting Started", self.display_name));
+                    let menubar = menu::Blueprint {
+                        title: APP_NAME.into(),
+                        items: vec![menu::Item::SubMenu(menu::Blueprint {
+                            title: "".into(),
+                            items: vec![
+                                menu::Item::Entry {
+                                    title: format!("About {}", APP_NAME),
+                                    shortcut: menu::Shortcut::None,
+                                    action: menu::Action::System(
+                                        menu::SystemAction::LaunchAboutWindow,
+                                    ),
+                                },
+                                menu::Item::Separator,
+                                menu::Item::Entry {
+                                    title: "Settings...".into(),
+                                    shortcut: menu::Shortcut::System(
+                                        menu::SystemShortcut::Preferences,
+                                    ),
+                                    action: menu::Action::System(
+                                        menu::SystemAction::LaunchPreferences,
+                                    ),
+                                },
+                                menu::Item::Separator,
+                                menu::Item::Entry {
+                                    title: "Services".into(),
+                                    shortcut: menu::Shortcut::None,
+                                    action: menu::Action::System(menu::SystemAction::ServicesMenu),
+                                },
+                                menu::Item::Separator,
+                                menu::Item::Entry {
+                                    title: format!("Hide {}", APP_NAME),
+                                    shortcut: menu::Shortcut::System(menu::SystemShortcut::HideApp),
+                                    action: menu::Action::System(menu::SystemAction::HideApp),
+                                },
+                                menu::Item::Entry {
+                                    title: "Hide Others".into(),
+                                    shortcut: menu::Shortcut::System(
+                                        menu::SystemShortcut::HideOthers,
+                                    ),
+                                    action: menu::Action::System(menu::SystemAction::HideOthers),
+                                },
+                                menu::Item::Entry {
+                                    title: "Show All".into(),
+                                    shortcut: menu::Shortcut::None,
+                                    action: menu::Action::System(menu::SystemAction::ShowAll),
+                                },
+                                menu::Item::Separator,
+                                menu::Item::Entry {
+                                    title: format!("Quit {}", APP_NAME),
+                                    shortcut: menu::Shortcut::System(menu::SystemShortcut::QuitApp),
+                                    action: menu::Action::System(menu::SystemAction::Terminate),
+                                },
+                            ],
+                        })],
+                    };
+
+                    let mut splash_screen = SplashScreen::new(
+                        format!("{} — Getting Started", self.display_name,),
+                        self.platform_menubar.clone(),
+                        Some(menubar),
+                    );
                     splash_screen.resumed(event_loop);
                     self.splash_screen = Some(splash_screen);
                 }
@@ -212,8 +284,12 @@ impl ApplicationHandler for Application {
 }
 
 fn runner(_app: &mut App) -> AppExit {
-    let event_loop = EventLoop::new().expect("Failed to create event loop manager.");
-    let mut app = Application::new(APP_NAME.into(), StartupAction::FirstTime);
+    let mut event_loop_builder = EventLoop::builder();
+    let platform_menubar = Arc::new(menu::platform_setup(&mut event_loop_builder));
+    let event_loop = event_loop_builder
+        .build()
+        .expect("Failed to create event loop manager.");
+    let mut app = Application::new(APP_NAME.into(), platform_menubar, StartupAction::FirstTime);
     match event_loop.run_app(&mut app) {
         Err(error) => {
             log::error!("Event loop exited with error: {}", error);

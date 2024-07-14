@@ -11,3 +11,5 @@ edition = "2021"
 log = { workspace = true }
 # GUI
 winit = { workspace = true }
+# Utilities
+bitflags = "2.6"

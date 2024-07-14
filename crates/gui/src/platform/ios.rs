@@ -1,17 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of
 // the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-mod platform;
-mod splash_screen;
-mod window_manager;
-
-pub mod keyboard;
-pub mod menu;
-
-pub mod window {
-    pub use super::splash_screen::SplashScreen;
-
-    pub use super::window_manager::WindowManager;
-}
+// FIXME: Should use the UiKit APIs to setup a hamburger menu for our “menubar.”
+pub use super::default::menubar;
 
 // End of File
