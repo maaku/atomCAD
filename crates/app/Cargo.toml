@@ -1,0 +1,11 @@
+[package]
+name = "atomcad-app"
+version = "0.1.0"
+publish = false
+authors = ["Machine Phase Systems <hello@machinephase.systems>"]
+license = "MPL-2.0"
+edition = "2021"
+
+[dependencies]
+# rust
+readonly = { workspace = true }
