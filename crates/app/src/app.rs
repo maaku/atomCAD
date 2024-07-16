@@ -1,7 +1,9 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of
 // the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
+use crate::Plugin;
 use core::num::NonZero;
+use std::collections::HashSet;
 
 /// The status code to use when exiting the application.  It is the value returned by the
 /// application runner, and passed back to the callee of [`App::run`].
@@ -33,6 +35,10 @@ pub struct App {
     /// The application runner, a closure run by [`App::run`] that processes the main loop of the
     /// application.  This is set by [`App::set_runner`], and defaults to [`run_once`].
     runner: RunnerFn,
+    /// A set of plugin IDs that have already been registered with the application.  This set is
+    /// checked on each call to [`App::add_plugin`] to ensure that a plugin is not added to the same
+    /// application instance more than once, unless [`Plugin::is_unique`] returns `false`.
+    plugins: HashSet<std::any::TypeId>,
 }
 
 /// The default application runner, which features no event loop.  This is useful for simple
@@ -69,6 +75,7 @@ impl App {
         Self {
             name,
             runner: Box::new(run_once),
+            plugins: HashSet::new(),
         }
     }
 
@@ -84,6 +91,30 @@ impl App {
     /// where that is a possibility).
     pub fn set_runner(&mut self, runner: impl FnOnce(&mut App) -> AppExit + 'static) -> &mut Self {
         self.runner = Box::new(runner);
+        self
+    }
+
+    /// Register a plugin with the application.  Plugins are used to configure the application and
+    /// provide additional functionality to maintain global state or service the application event
+    /// loop.  A given type of plugin can only be added to the same application instance once,
+    /// unless [`Plugin::is_unique`] returns `false`.
+    ///
+    /// # Panics
+    ///
+    /// * As must envisioned use cases involve separate plugin types for each configuration or
+    ///   feature, adding two plugins of the same type to the same application instance is generally
+    ///   disallowed, and will generally result in a panic.  See [`Plugin::is_unique`] for details.
+    pub fn add_plugin(&mut self, plugin: impl Plugin) -> &mut Self {
+        // Panic if the plugin is unique and has already been added to the application.
+        let id = plugin.id();
+        if plugin.is_unique() && self.plugins.contains(&id) {
+            panic!("Attempted to add a non-unique plugin to the same App instance twice");
+        }
+        self.plugins.insert(id);
+
+        // Call the plugin's build method, which configures the application.
+        plugin.build(self);
+
         self
     }
 
