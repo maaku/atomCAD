@@ -10,12 +10,16 @@
 mod app;
 pub use app::{run_once, App, AppExit};
 
+mod platform;
+mod platform_impl;
+pub use platform::PanicHandlerPlugin;
+
 mod plugin;
 pub use plugin::Plugin;
 
 /// A module which is typically glob imported.
 pub mod prelude {
-    pub use super::{App, AppExit, Plugin};
+    pub use super::{App, AppExit, PanicHandlerPlugin, Plugin};
 }
 
 // End of File
