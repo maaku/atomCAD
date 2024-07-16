@@ -12,18 +12,24 @@ members = ["crates/*"]
 [workspace.dependencies]
 # atomCAD
 app = { package = "atomcad-app", path = "crates/app" }
+gui = { package = "atomcad-gui", path = "crates/gui" }
 logging = { package = "atomcad-logging", path = "crates/logging" }
 # Logging
 log = "0.4"
 # rust
 readonly = "0.2.12"
+# Windowing
+winit = "0.30"
 
 [dependencies]
 # atomCAD
 app = { workspace = true }
+gui = { workspace = true }
 logging = { workspace = true }
 # Logging
 log = { workspace = true }
+# Windowing
+winit = { workspace = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 # Web platform support
@@ -32,3 +38,7 @@ wasm-bindgen = "0.2.92"
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 # Web platform support
 wasm-bindgen-test = "0.3.42"
+
+[target.'cfg(target_os = "android")'.dependencies]
+# Android platform support
+android-activity = { version = "0.6", features = ["game-activity"] }
